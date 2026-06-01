@@ -69,35 +69,11 @@ Use an absolute path — `~` is not expanded inside `settings.json`.
 
 The status line is loaded at startup. Close and reopen a Claude Code session to see it.
 
-## Multiple Claude Code instances (advanced)
-
-If you run multiple Claude Code instances with different config directories (e.g. one per client or context), you need a thin wrapper so each instance points to the correct `CLAUDE_CONFIG_DIR`.
-
-**Wrapper script** (`~/.claude/statusline-command.sh`):
-```bash
-#!/usr/bin/env bash
-export CLAUDE_CONFIG_DIR=/home/YOUR_USER/.claude
-exec bash /home/YOUR_USER/.claude/statusline.sh
-```
-
-Then in `~/.claude/settings.json`:
-```json
-{
-  "statusLine": {
-    "type": "command",
-    "command": "/home/YOUR_USER/.claude/statusline-command.sh"
-  }
-}
-```
-
-The script reads `CLAUDE_CONFIG_DIR` to locate the credentials file for OAuth fallback, and to read the `effortLevel` setting from `settings.json`.
-
 ## Options
 
 | Environment variable | Default | Description |
 |---|---|---|
 | `CLAUDE_CONFIG_DIR` | `~/.claude` | Path to Claude config directory |
-| `STATUSLINE_CHECK_UPDATES` | `true` | Set to `false` to disable GitHub update checks |
 | `CLAUDE_CODE_OAUTH_TOKEN` | — | Override OAuth token explicitly |
 
 ## How the script finds your OAuth token
@@ -109,14 +85,6 @@ The script tries these sources in order:
 3. Linux credentials file: `$CLAUDE_CONFIG_DIR/.credentials.json`
 4. GNOME Keyring (`secret-tool`)
 
-On Linux with the default Claude Code setup, source 3 is used automatically.
-
-## Updating
-
-The script checks for new releases on GitHub once every 24 hours. If a newer version is available, an update notice appears below the status line.
-
-To update manually, replace `statusline.sh` with the latest version from the [releases page](https://github.com/daniel3303/ClaudeCodeStatusLine/releases) or ask Claude: `"Find my installed status bar and update it"`.
-
 ## Troubleshooting
 
 **Status line shows `Claude` (static text)**
@@ -127,9 +95,3 @@ No usage data available. Either you are on a Free plan (rate limits not exposed)
 
 **Script not running**
 Verify the path in `settings.json` is absolute and the script is executable (`chmod +x`).
-
-**NixOS / missing `jq`**
-Add `jq` and `curl` to your system packages in `nixos/modules/dev_tools.nix` and rebuild:
-```bash
-sudo nixos-rebuild switch --flake /etc/nixos#
-```
