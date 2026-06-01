@@ -69,6 +69,19 @@ Use an absolute path — `~` is not expanded inside `settings.json`.
 
 The status line is loaded at startup. Close and reopen a Claude Code session to see it.
 
+## Security improvements over the original
+
+This script is a hardened fork of [daniel3303/ClaudeCodeStatusLine](https://github.com/daniel3303/ClaudeCodeStatusLine). The following issues were fixed:
+
+**OAuth token exposed in process list**
+The original passes the token as a `-H "Authorization: Bearer $token"` argument to `curl`, making it visible to any process that reads `/proc/<pid>/cmdline` (e.g. `ps aux`) during the fraction of a second curl runs. This fork passes all headers via `curl --config -` (stdin heredoc), so the token never appears as a command-line argument.
+
+**Cache directory world-readable**
+The original creates `/tmp/claude/` with default permissions (`755`), allowing any local user or daemon to read the cached usage data. This fork creates it with `700` (owner-only), and also fixes an existing `/tmp/claude` directory if it was already created with the wrong permissions.
+
+**Update checker removed**
+The original polls `https://api.github.com/repos/daniel3303/ClaudeCodeStatusLine/releases/latest` every 24 hours to check for new versions. Beyond the unnecessary outbound call to a third-party repo, this also leaks metadata about your Claude Code version and usage patterns. This fork removes the feature entirely — updates are managed through git.
+
 ## Options
 
 | Environment variable | Default | Description |
