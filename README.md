@@ -1,0 +1,1 @@
+# claude-code-safe-status-line
